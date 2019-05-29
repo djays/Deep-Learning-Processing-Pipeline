@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 import argparse
 
-def init_logger(app_postfix):
+def init_logger():
     """ Initialize the application level logger.
     Parameters
     --------
@@ -11,7 +11,7 @@ def init_logger(app_postfix):
             Logger name postfix
 
     """
-    logger = logging.getLogger(config.APP_NAME + '_' + app_postfix)
+    logger = logging.getLogger(config.APP_NAME)
     logger.setLevel(config.APP_LOG_LEVEL)
     hdlr = logging.FileHandler(config.APP_LOG_FILE)
     logger.addHandler(hdlr)

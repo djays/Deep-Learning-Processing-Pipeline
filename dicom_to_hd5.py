@@ -10,6 +10,7 @@ from pydicom.filereader import dcmread
 import numpy as np
 import h5py
 import json
+import logging
 
 
 def construct_volume(dcms):
@@ -56,7 +57,7 @@ def save_record(volume, attribs, path_hdf5, path_json):
         json.dump(attribs, json_file)
 
 
-def app(input_dicom, output_hdf5, output_json, logger):
+def app(input_dicom, output_hdf5 = None , output_json = None, save_records = True):
     """ Construct a 3D volume from the dicoms present in the path and
     save the pixel data to a HDf5 and attributes to a json.
 
@@ -71,6 +72,7 @@ def app(input_dicom, output_hdf5, output_json, logger):
 
     """
 
+    logger = logging.getLogger(config.APP_NAME)
     logger.info("Retrieving DICOMS")
     dcm_paths = utils.get_files(input_dicom, config.DCM2HD5_INPUT_EXT)
     dcms = [dcmread(str(path)) for path in dcm_paths]
@@ -82,7 +84,10 @@ def app(input_dicom, output_hdf5, output_json, logger):
     logger.info("Extracting Attributes")
     attributes = extract_attributes(dcms)
 
-    save_record(volume, attributes, output_hdf5, output_json)
+    if save_records:
+        save_record(volume, attributes, output_hdf5, output_json)
+
+    return volume, attributes
 
 
 if __name__ == '__main__':
@@ -95,7 +100,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # App Specific Logger
-    logger = utils.init_logger('D2H')
+    logger = utils.init_logger()
 
     # Main app logic
-    app(args.input_dicom, args.output_hdf5, args.output_json, logger)
+    app(args.input_dicom, args.output_hdf5, args.output_json)

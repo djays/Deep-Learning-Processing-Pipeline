@@ -31,6 +31,10 @@ class InferencePipeline:
 
         :return: a InferencePipeline object
         '''
+        self.job_register = {}
+
+        for job in registry:
+            self.register(job)
 
     def register(self, job: JobEntry):
         '''Add a job into the registry.
@@ -39,6 +43,8 @@ class InferencePipeline:
 
         :param job: A JobEntry object containing the job to be registered
         '''
+        self.job_queue[job.name] = job
+
 
     def unregister(self, job_name: str):
         '''Remove a job by name from the registry.
@@ -47,6 +53,7 @@ class InferencePipeline:
 
         :param job_name: the name of the job to be removed
         '''
+        self.job_register.popitem(job_name)
 
     def is_job_registered(self, job_name: str) -> bool:
         '''Check if a job_name is registered with the pipeline
@@ -54,6 +61,7 @@ class InferencePipeline:
         :param job_name: str, the unique name of the job
         :return: bool, if the job is registered
         '''
+        return job_name in self.job_register
 
     def execute(self, job_name: str, in_dicom_dir: str, out_dicom_dir: str):
         '''Execute a job specified by job_name, with the in_dicom_dir
@@ -64,3 +72,8 @@ class InferencePipeline:
         :param in_dicom_dir: a string, the path to the input DICOM folder
         :param out_dicom_dir: a string, the path to the output DICOM folder
         '''
+
+        cur_job = self.job_register[job_name]
+        preproc_out = cur_job.preprocess(in_dicom_dir, cur_job.config)
+        proc_out = cur_job.func(*preproc_out)
+

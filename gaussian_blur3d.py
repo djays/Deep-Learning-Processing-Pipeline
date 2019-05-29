@@ -1,5 +1,6 @@
 import numpy as np
-
+import dicom_to_hd5
+import pathlib
 
 def gaussian_blur3d(input_3d: np.ndarray, meta_data: dict,
                     config: dict) -> np.array:
@@ -13,3 +14,14 @@ def gaussian_blur3d(input_3d: np.ndarray, meta_data: dict,
 
     :return: the blurred volume in 3D numpy array, same size as input_3d
     '''
+    pass
+
+def pre_gaussian_blur3d(input_dir:str, config: dict):
+    """
+
+    :param input_dir: String path of the input directory
+    :param config: the dict to be passed to the main
+    :return:
+    """
+    return dicom_to_hd5.app(pathlib.Path(input_dir), save_records = False) +  (config,)
+

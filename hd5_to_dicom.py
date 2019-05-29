@@ -12,6 +12,7 @@ import numpy as np
 import h5py
 import json
 import os
+import logging
 
 def construct_volume(dcms):
     """ Construct 3D volume from the dicoms, slices arranged by slice location.
@@ -94,7 +95,7 @@ def split_volume_to_dcms(volume, template_dcms):
         dcm.SOPInstanceUID = generate_uid()
 
 
-def app(input_hdf5, input_dicom, output_dicom, logger):
+def app(input_hdf5, input_dicom, output_dicom):
     """ Export pixel data from hdf5 to DICOMs images based on template DICOMs.
 
     Parameters
@@ -108,7 +109,9 @@ def app(input_hdf5, input_dicom, output_dicom, logger):
 
     """
 
-    logger.info("Retrieving DICOMS")
+    logger = logging.getLogger(config.APP_NAME)
+
+    logger.info("Starting HDF5 to DICOM, Retrieving Template DICOMS")
     dcm_paths = utils.get_files(input_dicom, config.DCM2HD5_INPUT_EXT)
     dcms = [dcmread(str(path)) for path in dcm_paths]
 
@@ -139,10 +142,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # App Specific Logger
-    logger = utils.init_logger('H2D')
+    logger = utils.init_logger()
 
     # Main app logic
-    app(args.input_hdf5, args.input_dicom, args.output_dicom, logger)
+    app(args.input_hdf5, args.input_dicom, args.output_dicom)
 
 
 
