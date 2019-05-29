@@ -40,7 +40,7 @@ def save_record(volume, attribs, path_hdf5, path_json):
     logger.info("Saving Volume to HDF5 %s" % (path_hdf5,))
 
     volume_file = h5py.File(path_hdf5, "w")
-    volume_file.create_dataset("data", data=volume, dtype=np.float32)
+    volume_file.create_dataset(config.HD5_DATASET_NAME, data=volume, dtype=np.float32)
     volume_file.close()
 
     logger.info("Converting and Saving JSON to %s" % (path_json,))
