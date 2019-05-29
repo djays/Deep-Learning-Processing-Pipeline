@@ -70,7 +70,7 @@ def split_volume_to_dcms(volume, template_dcms):
         raise Exception("Number of template DCMS don't equal number of slices of 3d volume ")
 
     # Sort the template dcms to match the volume Slice Location
-    # TODO: Not mentioned but shouldnt SliceLocation be respected here?
+    ##TODO: Not mentioned but from the wording it appears that slice location doesnt have to be respected
     #template_dcms = sorted(template_dcms, key=lambda dcm: float(dcm.SliceLocation))
 
     # Generate UIDs
@@ -83,15 +83,15 @@ def split_volume_to_dcms(volume, template_dcms):
         # Establish Scale range and  normalize to 0 and 1
         type_info = np.iinfo(dcm.pixel_array.dtype)
         a_slice = (a_slice - np.min(a_slice))/np.ptp(a_slice)
-        # Temp measure to prevent over/underflow,
-        a_slice = a_slice.astype(np.int64 if type_info.min < 0 else np.uint64)
+        # Prevent over/underflow,
+        a_slice = a_slice.astype(np.float64)
         a_slice = a_slice * (type_info.max - type_info.min) + type_info.min
         a_slice = a_slice.astype(dcm.pixel_array.dtype)
 
         # Update Template
         dcm.PixelData = a_slice.tobytes()
         dcm.SeriesInstanceUID = series_iud
-        dcm.InstanceUID = generate_uid()
+        dcm.SOPInstanceUID = generate_uid()
 
 
 def app(input_hdf5, input_dicom, output_dicom, logger):
