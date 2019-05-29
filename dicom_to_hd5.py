@@ -85,7 +85,7 @@ if __name__ == '__main__':
 
     # Parse Arguments
     parser = argparse.ArgumentParser(description='Convert DICOMs to HD5 and JSON', add_help=False)
-    parser.add_argument('--input-dicom', '-i', required=True, type=existing_path, help='Directory with DICOMs and JSON')
+    parser.add_argument('--input-dicom', '-i', required=True, type=existing_path, help='Path to DICOM/s')
     parser.add_argument('--output-hdf5', '-h', required=True, help='Path to output HD5')
     parser.add_argument('--output-json', '-j', required=True, help='Path to output JSON')
     args = parser.parse_args()
