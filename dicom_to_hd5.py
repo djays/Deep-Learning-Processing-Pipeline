@@ -56,20 +56,23 @@ def save_record(volume, attribs, path_hdf5, path_json):
         json.dump(attribs, json_file)
 
 
-if __name__ == '__main__':
-    # Parse Arguments
-    parser = argparse.ArgumentParser(description='Convert DICOMs to HD5 and JSON', add_help=False)
-    parser.add_argument('--input-dicom', '-i', required=True, type=utils.existing_path(config.DCM2HD5_INPUT_EXT),
-                        help='Path to DICOM/s')
-    parser.add_argument('--output-hdf5', '-h', required=True, help='Path to output HD5')
-    parser.add_argument('--output-json', '-j', required=True, help='Path to output JSON')
-    args = parser.parse_args()
+def app(input_dicom, output_hdf5, output_json, logger):
+    """ Construct a 3D volume from the dicoms present in the path and
+    save the pixel data to a HDf5 and attributes to a json.
 
-    logger = utils.init_logger()
-    logger.info("App Log initiated")
+    Parameters
+    --------
+    input_dicom: Path
+            Path to a/many DICOMs
+    output_hdf5: str
+            Path to create output HDF5
+    output_json:
+            Path to create output JSON
+
+    """
 
     logger.info("Retrieving DICOMS")
-    dcm_paths = utils.get_files(args.input_dicom, config.DCM2HD5_INPUT_EXT)
+    dcm_paths = utils.get_files(input_dicom, config.DCM2HD5_INPUT_EXT)
     dcms = [dcmread(str(path)) for path in dcm_paths]
     logger.info("Got %d DICOMS" % len(dcms))
 
@@ -79,4 +82,20 @@ if __name__ == '__main__':
     logger.info("Extracting Attributes")
     attributes = extract_attributes(dcms)
 
-    save_record(volume, attributes, args.output_hdf5, args.output_json)
+    save_record(volume, attributes, output_hdf5, output_json)
+
+
+if __name__ == '__main__':
+    # Parse Arguments
+    parser = argparse.ArgumentParser(description='Convert DICOMs to HD5 and JSON', add_help=False)
+    parser.add_argument('--input-dicom', '-i', required=True, type=utils.existing_path(config.DCM2HD5_INPUT_EXT),
+                        help='Path to DICOM/s')
+    parser.add_argument('--output-hdf5', '-h', required=True, help='Path to output HD5')
+    parser.add_argument('--output-json', '-j', required=True, help='Path to output JSON')
+    args = parser.parse_args()
+
+    # App Specific Logger
+    logger = utils.init_logger('D2H')
+
+    # Main app logic
+    app(args.input_dicom, args.output_hdf5, args.output_json, logger)

@@ -5,6 +5,7 @@ APP_NAME='subtle'
 APP_LOG_FILE = 'debug.log'
 APP_LOG_LEVEL = logging.DEBUG
 DCM2HD5_INPUT_EXT = ('.dcm', '.DCM')
+HD5_INPUT_EXT = ('.hd5', '.HD5')
 FILE_NAME_SEP = '_'
 OUTPUT_FORMAT = '%s\t%d'
 DCM_TO_JSON_MAP = {'SpacingBetweenSlices' : 'spacing_slices', 'PixelSpacing': 'spacing_pixel' , 'Modality': 'modality'}
