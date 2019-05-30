@@ -4,6 +4,7 @@ import logging
 import config
 
 
+
 # Create a namedtuple type as the entries in a job registry
 JobEntry = collections.namedtuple('JobEntry',
                                   'name config preprocess postprocess func')
@@ -96,7 +97,7 @@ class InferencePipeline:
             job_info['status'] = JobStatus.SUCCESS
         except Exception as e:
             job_info['status'] = JobStatus.FAILED
-            self.logger.warning('Job Execution Failed with error : %s', e)
+            self.logger.exception('Job Execution Failed with error : %s', e)
 
 
     def find_job_by_output(self, out_dicom_dir):

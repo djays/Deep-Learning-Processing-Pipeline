@@ -71,7 +71,7 @@ def query(request):
 
 
 async def init_app():
-    app = web.Application()
+    app = web.Application(debug=True)
     app.add_routes(routes)
     return app
 
