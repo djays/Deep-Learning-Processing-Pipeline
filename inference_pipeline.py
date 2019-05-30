@@ -1,10 +1,18 @@
 import collections
+from enum import Enum
+import logging
+import config
 
 
 # Create a namedtuple type as the entries in a job registry
 JobEntry = collections.namedtuple('JobEntry',
                                   'name config preprocess postprocess func')
 
+class JobStatus(Enum):
+    PENDING=0
+    EXECUTING=1
+    SUCCESS=2
+    FAILED=3
 
 class InferencePipeline:
     '''Registers and executes inference jobs.
@@ -31,10 +39,12 @@ class InferencePipeline:
 
         :return: a InferencePipeline object
         '''
+        self.logger = logging.getLogger(config.APP_NAME)
         self.job_register = {}
 
         for job in registry:
             self.register(job)
+
 
     def register(self, job: JobEntry):
         '''Add a job into the registry.
@@ -43,7 +53,7 @@ class InferencePipeline:
 
         :param job: A JobEntry object containing the job to be registered
         '''
-        self.job_queue[job.name] = job
+        self.job_register[job.name] = {'job':job, 'status': JobStatus.PENDING}
 
 
     def unregister(self, job_name: str):
@@ -53,7 +63,7 @@ class InferencePipeline:
 
         :param job_name: the name of the job to be removed
         '''
-        self.job_register.popitem(job_name)
+        self.job_register.pop(job_name)
 
     def is_job_registered(self, job_name: str) -> bool:
         '''Check if a job_name is registered with the pipeline
@@ -73,7 +83,17 @@ class InferencePipeline:
         :param out_dicom_dir: a string, the path to the output DICOM folder
         '''
 
-        cur_job = self.job_register[job_name]
-        preproc_out = cur_job.preprocess(in_dicom_dir, cur_job.config)
-        proc_out = cur_job.func(*preproc_out)
+        job_info = self.job_register[job_name]
+        cur_job = job_info['job']
+        job_info['status'] = JobStatus.EXECUTING
+        try:
+            preproc_out = cur_job.preprocess(in_dicom_dir, cur_job.config)
+            proc_out = cur_job.func(*preproc_out)
+            cur_job.postprocess(in_dicom_dir, out_dicom_dir, proc_out)
+            self.job_register[job_name]['output'] = out_dicom_dir
+            job_info['status'] = JobStatus.SUCCESS
+        except Exception as e:
+            job_info['status'] = JobStatus.FAILED
+            self.logger.warning('Job Execution Failed with error : %s', e)
+
 

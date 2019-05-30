@@ -32,8 +32,20 @@ def construct_volume(dcms):
 
 def extract_attributes(dcms):
     """Extract Desired attributes from dicom to json"""
-    return {config.DCM_TO_JSON_MAP[dcm_attrib]: dcms[0].get(dcm_attrib, None)
+    attributes =  {config.DCM_TO_JSON_MAP[dcm_attrib]: dcms[0].get(dcm_attrib, None)
             for dcm_attrib in config.DCM_TO_JSON_MAP}
+
+    # Map DICOM types to standard Python compatible format
+    for key, val in attributes.items():
+        type_val = type(val)
+        if type_val in config.DCM_TYPE_TO_JSON_MAP:
+            attributes[key] = config.DCM_TYPE_TO_JSON_MAP[type_val](val)
+
+    # Merge Different spacings
+    attributes['spacing'] = tuple(float(pixels) for pixels in attributes['spacing_pixel']) + (attributes['spacing_slices'],)
+
+    return attributes
+
 
 
 def save_record(volume, attribs, path_hdf5, path_json):
@@ -46,18 +58,13 @@ def save_record(volume, attribs, path_hdf5, path_json):
 
     logger.info("Converting and Saving JSON to %s" % (path_json,))
 
-    # Map DICOM types to JSON compatible format
-    for key, val in attribs.items():
-        type_val = type(val)
-        if type_val in config.DCM_TYPE_TO_JSON_MAP:
-            attribs[key] = config.DCM_TYPE_TO_JSON_MAP[type_val](val)
 
     # Write the JSON
     with open(path_json, 'w') as json_file:
         json.dump(attribs, json_file)
 
 
-def app(input_dicom, output_hdf5 = None , output_json = None, save_records = True):
+def dicom_to_hd5(input_dicom, output_hdf5 = None , output_json = None, save_records = True):
     """ Construct a 3D volume from the dicoms present in the path and
     save the pixel data to a HDf5 and attributes to a json.
 
@@ -73,6 +80,7 @@ def app(input_dicom, output_hdf5 = None , output_json = None, save_records = Tru
     """
 
     logger = logging.getLogger(config.APP_NAME)
+
     logger.info("Retrieving DICOMS")
     dcm_paths = utils.get_files(input_dicom, config.DCM2HD5_INPUT_EXT)
     dcms = [dcmread(str(path)) for path in dcm_paths]
@@ -103,4 +111,4 @@ if __name__ == '__main__':
     logger = utils.init_logger()
 
     # Main app logic
-    app(args.input_dicom, args.output_hdf5, args.output_json)
+    dicom_to_hd5(args.input_dicom, args.output_hdf5, args.output_json)

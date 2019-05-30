@@ -14,3 +14,4 @@ HD5_INPUT_EXT = ('.hd5', '.HD5')
 HD5_DATASET_NAME = 'data'
 FILE_NAME_SEP = '_'
 OUTPUT_FORMAT = '%s\t%d'
+

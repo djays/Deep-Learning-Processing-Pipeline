@@ -95,13 +95,13 @@ def split_volume_to_dcms(volume, template_dcms):
         dcm.SOPInstanceUID = generate_uid()
 
 
-def app(input_hdf5, input_dicom, output_dicom):
+def hd5_to_dicom(input_hdf5, input_dicom, output_dicom):
     """ Export pixel data from hdf5 to DICOMs images based on template DICOMs.
 
     Parameters
     --------
-    input_hdf5: pathlib.Path
-            Path to a 3D volume
+    input_hdf5: Union[np.ndarray, pathlib.Path]
+            3D volume or file path to it
     input_dicom: pathlib.Path
             Path to a/many template DICOMs
     output_dicom: str
@@ -117,7 +117,7 @@ def app(input_hdf5, input_dicom, output_dicom):
 
     logger.info("Got %d DICOMS" % len(dcms))
 
-    volume = read_hdf5_dataset(input_hdf5)
+    volume = read_hdf5_dataset(input_hdf5) if not isinstance(input_hdf5, np.ndarray) else input_hdf5
 
     logger.info("Spliting 3D Volume to dcms")
     split_volume_to_dcms(volume, dcms)
@@ -145,7 +145,7 @@ if __name__ == '__main__':
     logger = utils.init_logger()
 
     # Main app logic
-    app(args.input_hdf5, args.input_dicom, args.output_dicom)
+    hd5_to_dicom(args.input_hdf5, args.input_dicom, args.output_dicom)
 
 
 
