@@ -9,10 +9,12 @@ JobEntry = collections.namedtuple('JobEntry',
                                   'name config preprocess postprocess func')
 
 class JobStatus(Enum):
+    INVALID = -1
     PENDING=0
     EXECUTING=1
     SUCCESS=2
     FAILED=3
+
 
 class InferencePipeline:
     '''Registers and executes inference jobs.
@@ -86,14 +88,24 @@ class InferencePipeline:
         job_info = self.job_register[job_name]
         cur_job = job_info['job']
         job_info['status'] = JobStatus.EXECUTING
+        job_info['output'] = out_dicom_dir
         try:
             preproc_out = cur_job.preprocess(in_dicom_dir, cur_job.config)
             proc_out = cur_job.func(*preproc_out)
             cur_job.postprocess(in_dicom_dir, out_dicom_dir, proc_out)
-            self.job_register[job_name]['output'] = out_dicom_dir
             job_info['status'] = JobStatus.SUCCESS
         except Exception as e:
             job_info['status'] = JobStatus.FAILED
             self.logger.warning('Job Execution Failed with error : %s', e)
 
 
+    def find_job_by_output(self, out_dicom_dir):
+        '''
+        Find job with the associated output directory
+        :param out_dicom_dir:
+        :return:
+        '''
+        for job_name, job_info in self.job_register.items():
+            if 'output' in job_info and job_info['output'] == out_dicom_dir:
+                return job_info['status'], job_info['output']
+        return JobStatus.INVALID, None

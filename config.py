@@ -15,3 +15,5 @@ HD5_DATASET_NAME = 'data'
 FILE_NAME_SEP = '_'
 OUTPUT_FORMAT = '%s\t%d'
 
+WEB_OUTPUT_DIR = 'web-out'
+
