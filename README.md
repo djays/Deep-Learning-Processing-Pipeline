@@ -16,7 +16,9 @@ To simplify implementation, an ASCII UID is generated and also used as output di
 ## Design : Gaussian Kernel
 The pre, post and processing steps for the mock Gaussian task are implemented in gaussian_blur3d.py.
 For computing 3D blur, a 1d convolution is computing for each dimension using a 1d gaussian kernel.
-The algorithms creates the gaussian kernels with sigma for each dimension based on pixel spacing of the dimension. 
+The algorithms creates the gaussian kernels with sigma for each dimension based on pixel spacing of the dimension.
+
+The convolution operates on padded input help maintain original shape.   
 
 ## Design: Inference Pipeline
 A dictionary is used to track the job and its current execution state as 
@@ -97,19 +99,6 @@ Successful Response when done:
 
 
 
-## Debug
-By default, execution logs are stored in the current directory in debug.log
-
-## Unit Tests
-
-Tests are located in the test directory, while not complete, do allow for building upon 
-and adding new test cases
-e.g. For testing the basic functionality of the interface pipeline
-
-```
- python -m unittest test.test_inference_pipeline
-```
-
 ## Code Structure
   The code is designed to be extremely modular and re-usable, while following the Python paradigm KISS. 
   e.g. The web and script interfaces call the same code for dicom to hd5, while also avoiding 
@@ -130,3 +119,17 @@ e.g. For testing the basic functionality of the interface pipeline
   config.py -- Basic configuration settings and constants. 
  
   test -- Package housing test cases. 
+
+## Debug
+By default, execution logs are stored in the current directory in debug.log
+
+## Unit Tests
+
+Tests are located in the test directory, while not complete, do allow for building upon 
+and adding new test cases
+e.g. For testing the basic functionality of the interface pipeline
+
+```
+ python -m unittest test.test_inference_pipeline
+```
+
