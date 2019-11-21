@@ -1,6 +1,8 @@
-# DL Pipeline Tools for Medical Imaging
-
-Tools for Medical Imaging 
+# Processing pipeline for Medical Imaging
+ Contains
+ 1. A webserver to receive and queue jobs.
+ 2. A gaussian task which consists of pre-processing (DICOM to HD5), processing (3D Gaussian Kernel) and post-processing steps (HD5 to DICOM). 
+ 
 Implemented using Python 3.5, Aiohttp and Numpy.
  
 
