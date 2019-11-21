@@ -1,7 +1,7 @@
 import logging
 import pydicom
 
-APP_NAME='subtle'
+APP_NAME='pipeline'
 APP_LOG_FILE = 'debug.log'
 APP_LOG_LEVEL = logging.DEBUG
 
